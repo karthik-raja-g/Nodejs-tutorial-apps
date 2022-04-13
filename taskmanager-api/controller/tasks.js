@@ -1,8 +1,13 @@
+const Task = require('../models/Task');
 const getTasks = (req, res) => {
-  res.send("Router from controller");
+  res.send({ data: [{ name: "john" }, { name: "alice" }] });
 };
 
-const createTask = () => {};
+const createTask = async (req,res) => {
+  console.log(req.body, "body");
+  const task = await Task.create(req.body);
+  res.status(201).json({task})
+};
 const getSingleTask = () => {};
 const updateTask = () => {};
 const deleteTask = () => {};

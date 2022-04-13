@@ -1,18 +1,27 @@
+require("dotenv").config();
 const express = require("express");
 const process = require("process");
-require("dotenv").config();
-require('./db/connect');
+const connectDB = require("./db/connect");
 
 const tasks = require("./routes/tasks");
 
 const PORT = process.env.SERVER_PORT;
+const DB_URL = process.env.DB_URL;
 const app = express();
 
 app.use(express.json());
 
 app.use("/api/v1/tasks", tasks);
 
-// app.get("/", (req, res) => res.send("Hello world"));
-app.listen(PORT, () => {
-  console.log(`Server up in port ${PORT}`);
-});
+const start = async () => {
+  try {
+    await connectDB(DB_URL);
+    app.listen(PORT, () => {
+      console.log(`Server up in port ${PORT}`);
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+start();
