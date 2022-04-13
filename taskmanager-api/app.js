@@ -10,7 +10,7 @@ const DB_URL = process.env.DB_URL;
 const app = express();
 
 app.use(express.json());
-
+app.use(express.static('./public'))
 app.use("/api/v1/tasks", tasks);
 
 const start = async () => {
