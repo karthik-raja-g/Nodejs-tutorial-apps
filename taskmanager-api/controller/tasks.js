@@ -1,5 +1,6 @@
 const Task = require("../models/Task");
 const asyncWrapper = require("../middlewares/async");
+const { TaskManagerError } = require("../customErrors");
 
 const getTasks = asyncWrapper(async (req, res) => {
   const tasks = await Task.find({});
@@ -11,10 +12,15 @@ const createTask = asyncWrapper(async (req, res) => {
   res.status(201).json({ task });
 });
 
-const getSingleTask = asyncWrapper(async (req, res) => {
+const getSingleTask = asyncWrapper(async (req, res, next) => {
   const { id: taskId } = req.params;
   const task = await Task.findOne({ _id: taskId });
-  if (!task) return res.status(404).json({ message: "No data found" });
+
+  if (!task) {
+    // throw new TaskManagerError(`No task for id ${taskId}`, 404);
+    // OR
+    return next(new TaskManagerError(`No task for id ${taskId}`, 404))
+  }
   res.status(200).json({ task });
 });
 
@@ -24,16 +30,16 @@ const updateTask = asyncWrapper(async (req, res) => {
     new: true,
     runValidators: true,
   });
-  if (!task) return res.status(404).json({ message: "No data found" });
+  if (!task) throw new TaskManagerError(`No task for id ${taskId}`, 404);
+
   res.status(200).json({ task });
-  // const task = await Task.create(req.body);
-  // res.status(201).json({ task });
 });
 
 const deleteTask = asyncWrapper(async (req, res) => {
   const { id: taskId } = req.params;
   const task = await Task.findByIdAndDelete({ _id: taskId });
-  if (!task) return res.status(404).json({ message: "No data found" });
+  if (!task) throw new TaskManagerError(`No task for id ${taskId}`, 404);
+
   res.status(200).json({ task });
   // const task = await Task.create(req.body);
   // res.status(201).json({ task });
